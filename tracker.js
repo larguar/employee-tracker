@@ -48,11 +48,11 @@ function addDepartment() {
 	inquirer.prompt({
 		name: 'departmentName',
 		type: 'input',
-		message: 'What is the name of the department?'
+		message: 'Department Name:'
 	}).then(answer => {
 		connection.query('INSERT INTO department SET ?', { name: answer.departmentName }, err => {
 			if (err) throw err;
-			console.log('SUCCESS: Your department was added.');
+			console.log('SUCCESS: Department was added.');
 			start();
 		});
 	});
@@ -65,12 +65,12 @@ function addRole() {
 			{
 				name: 'role',
 				type: 'input',
-				message: 'What is the role?'
+				message: 'Role Name:'
 			},
 			{
 				name: 'salary',
 				type: 'input',
-				message: 'What is the salary?',
+				message: 'Salary:',
 				validate: value => {
 				  if (isNaN(value) === false) return true;
 				  return false;
@@ -79,7 +79,7 @@ function addRole() {
 			{
 				name: 'department',
 				type: 'list',
-				message: 'What is the department?',
+				message: 'Department:',
 				choices: () => {
 					const departments = [];
 					for (let i = 0; i < results.length; i++) {
@@ -97,7 +97,7 @@ function addRole() {
         	}        	
         	connection.query('INSERT INTO role SET ?', { title: answer.role, salary: answer.salary, department_id: departmentId }, err => {
 				if (err) throw err;
-				console.log('SUCCESS: Your role was added.');
+				console.log('SUCCESS: Role was added.');
 				start();
 			});
 		});
@@ -105,6 +105,43 @@ function addRole() {
 };
 
 function addEmployee() {
-	console.log(`addEmployee()`);
-	start();
+	connection.query('SELECT * FROM role', (err, results) => {	
+		if (err) throw err;
+		inquirer.prompt([
+			{
+				name: 'firstName',
+				type: 'input',
+				message: 'First Name:'
+			},
+			{
+				name: 'lastName',
+				type: 'input',
+				message: 'Last Name:'
+			},
+			{
+				name: 'role',
+				type: 'list',
+				message: 'Role:',
+				choices: () => {
+					const roles = [];
+					for (let i = 0; i < results.length; i++) {
+						roles.push(results[i].title);
+					}
+					return roles;
+				}
+			}
+		]).then(answer => {
+        	let roleId;
+			for (let i = 0; i < results.length; i++) {
+				if (results[i].title === answer.role) {
+					roleId = results[i].id;
+          		}
+        	}        	
+        	connection.query('INSERT INTO employee SET ?', { first_name: answer.firstName, last_name: answer.lastName, role_id: roleId }, err => {
+				if (err) throw err;
+				console.log('SUCCESS: Employee was added.');
+				start();
+			});
+		});
+	});
 };
