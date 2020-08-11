@@ -12,7 +12,7 @@ const connection = mysql.createConnection({
 
 connection.connect(err => {
   if (err) throw err;
-  console.log('Connected as id ' + connection.threadId);
+  console.log(' ');
   start();
 });
 
@@ -25,9 +25,12 @@ function start() {
 			'View All Departments',
 			'View All Roles',
 			'View All Employees',
-			'Add Department',
-			'Add Role',
-			'Add Employee',
+			'Add A Department',
+			'Add A Role',
+			'Add An Employee',
+			'Delete A Department',
+			'Delete A Role',
+			'Delete An Employee',
 			'Exit'
 		]
 	}).then(answer => {
@@ -41,16 +44,26 @@ function start() {
 			case 'View All Employees':
 				viewEmployees();
 				break;
-			case 'Add Department':
+			case 'Add A Department':
 				addDepartment();
 				break;
-			case 'Add Role':
+			case 'Add A Role':
 				addRole();
 				break;
-			case 'Add Employee':
+			case 'Add An Employee':
 				addEmployee();
 				break;
+			case 'Delete A Department':
+				deleteDepartment();
+				break;
+			case 'Delete A Role':
+				deleteRole();
+				break;
+			case 'Delete An Employee':
+				deleteEmployee();
+				break;
 			case 'Exit':
+				console.log(' ');
 				connection.end();
 				break;
 		}
@@ -105,7 +118,7 @@ function addDepartment() {
 	}).then(answer => {
 		connection.query('INSERT INTO department SET ?', { name: answer.departmentName }, err => {
 			if (err) throw err;
-			console.log('SUCCESS: Department was added.');
+			console.log(chalk.green('\nSUCCESS:'), 'Department was added.\n');
 			start();
 		});
 	});
@@ -150,7 +163,7 @@ function addRole() {
         	}        	
         	connection.query('INSERT INTO role SET ?', { title: answer.role, salary: answer.salary, department_id: departmentId }, err => {
 				if (err) throw err;
-				console.log('SUCCESS: Role was added.');
+				console.log(chalk.green('\nSUCCESS:'), 'Role was added.\n');
 				start();
 			});
 		});
@@ -194,9 +207,82 @@ function addEmployee() {
         	// Need to add Manager ID     	
         	connection.query('INSERT INTO employee SET ?', { first_name: answer.firstName, last_name: answer.lastName, role_id: roleId }, err => {
 				if (err) throw err;
-				console.log('SUCCESS: Employee was added.');
+				console.log(chalk.green('\nSUCCESS:'), 'Employee was added.\n');
 				start();
 			});
 		});
 	});
+};
+
+function deleteDepartment() {
+	connection.query('SELECT * FROM department', (err, res) => {
+		inquirer.prompt({
+			name: 'department',
+			type: 'list',
+			message: 'Department to Delete:',
+			choices: () => {
+				const departments = [];
+				for (let department of res) {
+					departments.push(department.name);
+				}
+				return departments;
+			}
+		}).then(answer => {
+			connection.query('DELETE FROM department WHERE ?', { name: answer.department }, err => {
+				if (err) throw err;
+				console.log(chalk.green('\nSUCCESS:'), 'Department was deleted.\n');
+				start();
+			});
+		});
+	});
+};
+
+function deleteRole() {
+	connection.query('SELECT * FROM role', (err, res) => {
+		inquirer.prompt({
+			name: 'role',
+			type: 'list',
+			message: 'Role to Delete:',
+			choices: () => {
+				const roles = [];
+				for (let role of res) {
+					roles.push(role.title);
+				}
+				return roles;
+			}
+		}).then(answer => {
+			connection.query('DELETE FROM role WHERE ?', { title: answer.role }, err => {
+				if (err) throw err;
+				console.log(chalk.green('\nSUCCESS:'), 'Role was deleted.\n');
+				start();
+			});
+		});
+	});
+};
+
+function deleteEmployee() {
+/*
+	connection.query('SELECT * FROM employee', (err, res) => {
+		inquirer.prompt({
+			// List all employee first and last names
+			name: 'employee',
+			type: 'list',
+			message: 'Employee to Delete:',
+			choices: () => {
+				const employees = [];
+				for (let employee of res) {
+					employees.push( );
+				}
+				return employees;
+			}
+		}).then(answer => {
+			connection.query('DELETE FROM employee WHERE ?', { id: answer.role }, err => {
+				if (err) throw err;
+				console.log(chalk.green('\nSUCCESS:'), 'Employee was deleted.\n');
+				start();
+			});
+		});
+	});
+*/
+	start();
 };
