@@ -1,5 +1,6 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
+const chalk = require('chalk');
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -57,8 +58,15 @@ function start() {
 }
 
 function viewDepartments() {
-	console.log(`viewDepartments()`);
-	start();
+	connection.query('SELECT * FROM department', (err, res) => {
+    	if (err) throw err;
+    	console.log(chalk.bold.cyan('\nDEPARTMENTS:'));
+	    for (let department of res) {
+		    console.log(`— ${department.name}`);
+	    }
+	    console.log(' ');
+	    start();
+	});
 }
 
 function viewRoles() {
