@@ -60,7 +60,7 @@ function start() {
 function viewDepartments() {
 	connection.query('SELECT * FROM department', (err, res) => {
     	if (err) throw err;
-    	console.log(chalk.bold.cyan('\nDEPARTMENTS:'));
+    	console.log(chalk.bold.bgCyan('\nDEPARTMENTS:'));
 	    for (let department of res) {
 		    console.log(`— ${department.name}`);
 	    }
@@ -70,8 +70,15 @@ function viewDepartments() {
 }
 
 function viewRoles() {
-	console.log(`viewRoles()`);
-	start();
+	connection.query('SELECT role.title, role.salary, department.name FROM role INNER JOIN department ON role.department_id = department.id', (err, res) => {
+    	if (err) throw err;
+    	console.log(chalk.bold.bgCyan('\nROLES:'));
+	    for (let role of res) {
+		    console.log(`— ${role.title}, $${role.salary}/year (${role.name})`);
+	    }
+	    console.log(' ');
+	    start();
+	});
 }
 
 function viewEmployees() {
