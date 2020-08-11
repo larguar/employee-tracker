@@ -45,8 +45,17 @@ function start() {
 }
 
 function addDepartment() {
-	console.log(`addDepartment()`);
-	start();
+	inquirer.prompt({
+		name: 'departmentName',
+		type: 'input',
+		message: 'What is the name of the department?'
+	}).then(answer => {
+		connection.query('INSERT INTO department SET ?', { name: answer.departmentName }, err => {
+			if (err) throw err;
+			console.log('SUCCESS: Your department was added.');
+			start();
+		});
+	});
 };
 
 function addRole() {
