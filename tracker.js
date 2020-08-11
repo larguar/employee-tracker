@@ -59,8 +59,49 @@ function addDepartment() {
 };
 
 function addRole() {
-	console.log(`addRole()`);
-	start();
+	connection.query('SELECT * FROM department', (err, results) => {	
+		if (err) throw err;
+		inquirer.prompt([
+			{
+				name: 'role',
+				type: 'input',
+				message: 'What is the role?'
+			},
+			{
+				name: 'salary',
+				type: 'input',
+				message: 'What is the salary?',
+				validate: value => {
+				  if (isNaN(value) === false) return true;
+				  return false;
+				}
+			},
+			{
+				name: 'department',
+				type: 'list',
+				message: 'What is the department?',
+				choices: () => {
+					const departments = [];
+					for (let i = 0; i < results.length; i++) {
+						departments.push(results[i].name);
+					}
+					return departments;
+				}
+			}
+		]).then(answer => {
+        	let departmentId;
+			for (let i = 0; i < results.length; i++) {
+				if (results[i].name === answer.department) {
+					departmentId = results[i].id;
+          		}
+        	}        	
+        	connection.query('INSERT INTO role SET ?', { title: answer.role, salary: answer.salary, department_id: departmentId }, err => {
+				if (err) throw err;
+				console.log('SUCCESS: Your role was added.');
+				start();
+			});
+		});
+	});
 };
 
 function addEmployee() {
