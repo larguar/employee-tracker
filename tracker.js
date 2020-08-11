@@ -82,8 +82,19 @@ function viewRoles() {
 }
 
 function viewEmployees() {
-	console.log(`viewEmployees()`);
-	start();
+	connection.query('SELECT employee.first_name, employee.last_name, employee.manager, role.title FROM employee INNER JOIN role ON employee.role_id = role.id', (err, res) => {
+    	if (err) throw err;
+    	console.log(chalk.bold.bgCyan('\nEMPLOYEES:'));
+	    for (let employee of res) {
+		    let employeeString = `— ${employee.first_name} ${employee.last_name}, ${employee.title}`;
+		    if (employee.manager) {
+			    employeeString += ` (Manager: ${employee.manager})`;
+		    }
+		    console.log(employeeString);
+	    }
+	    console.log(' ');
+	    start();
+	});
 }
 
 function addDepartment() {
@@ -101,7 +112,7 @@ function addDepartment() {
 };
 
 function addRole() {
-	connection.query('SELECT * FROM department', (err, results) => {	
+	connection.query('SELECT * FROM department', (err, res) => {	
 		if (err) throw err;
 		inquirer.prompt([
 			{
@@ -124,7 +135,7 @@ function addRole() {
 				message: 'Department:',
 				choices: () => {
 					const departments = [];
-					for (let department of results) {
+					for (let department of res) {
 						departments.push(department.name);
 					}
 					return departments;
@@ -132,7 +143,7 @@ function addRole() {
 			}
 		]).then(answer => {
         	let departmentId;
-			for (let department of results) {
+			for (let department of res) {
 				if (department.name === answer.department) {
 					departmentId = department.id;
           		}
@@ -147,7 +158,7 @@ function addRole() {
 };
 
 function addEmployee() {
-	connection.query('SELECT * FROM role', (err, results) => {	
+	connection.query('SELECT * FROM role', (err, res) => {	
 		if (err) throw err;
 		inquirer.prompt([
 			{
@@ -166,7 +177,7 @@ function addEmployee() {
 				message: 'Role:',
 				choices: () => {
 					const roles = [];
-					for (let role of results) {
+					for (let role of res) {
 						roles.push(role.title);
 					}
 					return roles;
@@ -175,7 +186,7 @@ function addEmployee() {
 			// Manager ID prompt goes here
 		]).then(answer => {
         	let roleId;
-			for (let role of results) {
+			for (let role of res) {
 				if (role.title === answer.role) {
 					roleId = role.id;
           		}
