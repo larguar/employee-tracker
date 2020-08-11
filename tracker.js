@@ -21,6 +21,9 @@ function start() {
 		type: 'list',
 		message: 'What would you like to do?',
 		choices: [
+			'View All Departments',
+			'View All Roles',
+			'View All Employees',
 			'Add Department',
 			'Add Role',
 			'Add Employee',
@@ -28,6 +31,15 @@ function start() {
 		]
 	}).then(answer => {
 		switch (answer.selectOption) {
+			case 'View All Departments':
+				viewDepartments();
+				break;
+			case 'View All Roles':
+				viewRoles();
+				break;
+			case 'View All Employees':
+				viewEmployees();
+				break;
 			case 'Add Department':
 				addDepartment();
 				break;
@@ -42,6 +54,21 @@ function start() {
 				break;
 		}
 	});
+}
+
+function viewDepartments() {
+	console.log(`viewDepartments()`);
+	start();
+}
+
+function viewRoles() {
+	console.log(`viewRoles()`);
+	start();
+}
+
+function viewEmployees() {
+	console.log(`viewEmployees()`);
+	start();
 }
 
 function addDepartment() {
@@ -82,17 +109,17 @@ function addRole() {
 				message: 'Department:',
 				choices: () => {
 					const departments = [];
-					for (let i = 0; i < results.length; i++) {
-						departments.push(results[i].name);
+					for (let department of results) {
+						departments.push(department.name);
 					}
 					return departments;
 				}
 			}
 		]).then(answer => {
         	let departmentId;
-			for (let i = 0; i < results.length; i++) {
-				if (results[i].name === answer.department) {
-					departmentId = results[i].id;
+			for (let department of results) {
+				if (department.name === answer.department) {
+					departmentId = department.id;
           		}
         	}        	
         	connection.query('INSERT INTO role SET ?', { title: answer.role, salary: answer.salary, department_id: departmentId }, err => {
@@ -117,26 +144,28 @@ function addEmployee() {
 				name: 'lastName',
 				type: 'input',
 				message: 'Last Name:'
-			},
+			},	
 			{
 				name: 'role',
 				type: 'list',
 				message: 'Role:',
 				choices: () => {
 					const roles = [];
-					for (let i = 0; i < results.length; i++) {
-						roles.push(results[i].title);
+					for (let role of results) {
+						roles.push(role.title);
 					}
 					return roles;
 				}
 			}
+			// Manager ID prompt goes here
 		]).then(answer => {
         	let roleId;
-			for (let i = 0; i < results.length; i++) {
-				if (results[i].title === answer.role) {
-					roleId = results[i].id;
+			for (let role of results) {
+				if (role.title === answer.role) {
+					roleId = role.id;
           		}
-        	}        	
+        	}   
+        	// Need to add Manager ID     	
         	connection.query('INSERT INTO employee SET ?', { first_name: answer.firstName, last_name: answer.lastName, role_id: roleId }, err => {
 				if (err) throw err;
 				console.log('SUCCESS: Employee was added.');
