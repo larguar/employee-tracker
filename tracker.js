@@ -74,8 +74,8 @@ function viewDepartments() {
 	connection.query('SELECT * FROM department', (err, res) => {
     	if (err) throw err;
     	console.log(chalk.bold.bgCyan('\nDEPARTMENTS:'));
-	    for (let department of res) {
-		    console.log(`— ${department.name}`);
+	    for (let i of res) {
+		    console.log(`— ${i.name}`);
 	    }
 	    console.log(' ');
 	    start();
@@ -86,8 +86,8 @@ function viewRoles() {
 	connection.query('SELECT role.title, role.salary, department.name FROM role INNER JOIN department ON role.department_id = department.id', (err, res) => {
     	if (err) throw err;
     	console.log(chalk.bold.bgCyan('\nROLES:'));
-	    for (let role of res) {
-		    console.log(`— ${role.title}, $${role.salary}/year (${role.name})`);
+	    for (let i of res) {
+		    console.log(`— ${i.title}, $${i.salary}/year (${i.name})`);
 	    }
 	    console.log(' ');
 	    start();
@@ -98,10 +98,10 @@ function viewEmployees() {
 	connection.query('SELECT employee.first_name, employee.last_name, employee.manager, role.title FROM employee INNER JOIN role ON employee.role_id = role.id', (err, res) => {
     	if (err) throw err;
     	console.log(chalk.bold.bgCyan('\nEMPLOYEES:'));
-	    for (let employee of res) {
-		    let employeeString = `— ${employee.first_name} ${employee.last_name}, ${employee.title}`;
-		    if (employee.manager) {
-			    employeeString += ` (Manager: ${employee.manager})`;
+	    for (let i of res) {
+		    let employeeString = `— ${i.first_name} ${i.last_name}, ${i.title}`;
+		    if (i.manager) {
+			    employeeString += ` (Manager: ${i.manager})`;
 		    }
 		    console.log(employeeString);
 	    }
@@ -148,17 +148,17 @@ function addRole() {
 				message: 'Department:',
 				choices: () => {
 					const departments = [];
-					for (let department of res) {
-						departments.push(department.name);
+					for (let i of res) {
+						departments.push(i.name);
 					}
 					return departments;
 				}
 			}
 		]).then(answer => {
         	let departmentId;
-			for (let department of res) {
-				if (department.name === answer.department) {
-					departmentId = department.id;
+			for (let i of res) {
+				if (i.name === answer.department) {
+					departmentId = i.id;
           		}
         	}        	
         	connection.query('INSERT INTO role SET ?', { title: answer.role, salary: answer.salary, department_id: departmentId }, err => {
@@ -190,8 +190,8 @@ function addEmployee() {
 				message: 'Role:',
 				choices: () => {
 					const roles = [];
-					for (let role of res) {
-						roles.push(role.title);
+					for (let i of res) {
+						roles.push(i.title);
 					}
 					return roles;
 				}
@@ -199,9 +199,9 @@ function addEmployee() {
 			// Manager ID prompt goes here
 		]).then(answer => {
         	let roleId;
-			for (let role of res) {
-				if (role.title === answer.role) {
-					roleId = role.id;
+			for (let i of res) {
+				if (i.title === answer.role) {
+					roleId = i.id;
           		}
         	}   
         	// Need to add Manager ID     	
@@ -222,8 +222,8 @@ function deleteDepartment() {
 			message: 'Department to Delete:',
 			choices: () => {
 				const departments = [];
-				for (let department of res) {
-					departments.push(department.name);
+				for (let i of res) {
+					departments.push(i.name);
 				}
 				return departments;
 			}
@@ -245,8 +245,8 @@ function deleteRole() {
 			message: 'Role to Delete:',
 			choices: () => {
 				const roles = [];
-				for (let role of res) {
-					roles.push(role.title);
+				for (let i of res) {
+					roles.push(i.title);
 				}
 				return roles;
 			}
@@ -261,28 +261,31 @@ function deleteRole() {
 };
 
 function deleteEmployee() {
-/*
 	connection.query('SELECT * FROM employee', (err, res) => {
 		inquirer.prompt({
-			// List all employee first and last names
 			name: 'employee',
 			type: 'list',
 			message: 'Employee to Delete:',
 			choices: () => {
-				const employees = [];
-				for (let employee of res) {
-					employees.push( );
+				const names = [];
+				for (let i of res) {
+					names.push(`${i.first_name} ${i.last_name}`);
 				}
-				return employees;
+				return names;
 			}
-		}).then(answer => {
-			connection.query('DELETE FROM employee WHERE ?', { id: answer.role }, err => {
+		}).then(answer => {		
+			let deleteId;	
+			for (let i of res) {
+				let deleteName = `${i.first_name} ${i.last_name}`;
+				if (deleteName === answer.employee) {
+					deleteId = i.id;
+				}
+			}	
+			connection.query('DELETE FROM employee WHERE ?', { id: deleteId }, err => {
 				if (err) throw err;
 				console.log(chalk.green('\nSUCCESS:'), 'Employee was deleted.\n');
 				start();
 			});
 		});
 	});
-*/
-	start();
 };
