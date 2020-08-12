@@ -31,6 +31,9 @@ function start() {
 			'Delete A Department',
 			'Delete A Role',
 			'Delete An Employee',
+			'Update A Role\'s Salary',
+			'Update An Employee\'s Role',
+			'Update An Employee\'s Manager',
 			'Exit'
 		]
 	}).then(answer => {
@@ -61,6 +64,15 @@ function start() {
 				break;
 			case 'Delete An Employee':
 				deleteEmployee();
+				break;
+			case 'Update A Role\'s Salary':
+				updateSalary();
+				break;
+			case 'Update An Employee\'s Role':
+				updateRole();
+				break;
+			case 'Update An Employee\'s Manager':
+				updateManager();
 				break;
 			case 'Exit':
 				console.log(' ');
@@ -288,4 +300,48 @@ function deleteEmployee() {
 			});
 		});
 	});
+};
+
+function updateSalary() {
+	connection.query('SELECT * FROM role', (err, res) => {
+		inquirer.prompt([
+			{
+				name: 'title',
+				type: 'list',
+				message: 'Role:',
+				choices: () => {
+					const roles = [];
+					for (let i of res) {
+						roles.push(i.title);
+					}
+					return roles;
+				}
+			},
+			{
+				name: 'salary',
+				type: 'input',
+				message: 'New Salary:',
+				validate: value => {
+				  if (isNaN(value) === false) return true;
+				  return false;
+				}
+			}
+		]).then(answer => {	
+			connection.query('UPDATE role SET salary = ? WHERE title = ?', [answer.salary, answer.title], err => {
+				if (err) throw err;
+				console.log(chalk.green('\nSUCCESS:'), 'Salary was updated.\n');
+				start();
+			});
+		});
+	});
+};
+
+function updateRole() {
+	console.log(`updateRole()`);
+	start();
+};
+
+function updateManager() {
+	console.log(`updateManager()`);
+	start();
 };
