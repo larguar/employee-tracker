@@ -85,156 +85,76 @@ function start() {
 	});
 };
 
-function viewDepartments() {
-	connection.query('SELECT * FROM department', (err, res) => {
-    	if (err) throw err;
-    	console.log(chalk.bold.bgCyan('\nDEPARTMENTS:'));
-	    for (let i of res) {
-		    console.log(`— ${i.name}`);
-	    }
-	    console.log(' ');
-	    start();
-	});
+async function viewDepartments() {
+	const res = await queryAsync('SELECT * FROM department');
+
+	console.log(chalk.bold.bgCyan('\nDEPARTMENTS:'));
+    for (let i of res) {
+	    console.log(`— ${i.name}`);
+    }
+    console.log(' ');
+    start();
 };
 
-function viewRoles() {
-	connection.query('SELECT role.title, role.salary, department.name FROM role INNER JOIN department ON role.departmentId = department.id', (err, res) => {
-    	if (err) throw err;
-    	console.log(chalk.bold.bgCyan('\nROLES:'));
-	    for (let i of res) {
-		    console.log(`— ${i.title}, $${i.salary}/year (${i.name})`);
-	    }
-	    console.log(' ');
-	    start();
-	});
+async function viewRoles() {
+	const res = await queryAsync('SELECT role.title, role.salary, department.name FROM role INNER JOIN department ON role.departmentId = department.id');
+
+    console.log(chalk.bold.bgCyan('\nROLES:'));
+    for (let i of res) {
+	    console.log(`— ${i.title}, $${i.salary}/year (${i.name})`);
+    }
+    console.log(' ');
+    start();
 };
 
-function viewEmployees() {
-	connection.query('SELECT employee.firstName, employee.lastName, employee.managerId, role.title FROM employee INNER JOIN role ON employee.roleId = role.id', (err, res) => {
-    	if (err) throw err;
-    	console.log(chalk.bold.bgCyan('\nEMPLOYEES:'));
-	    for (let i of res) {
-		    let employeeString = `— ${i.firstName} ${i.lastName}, ${i.title}`;
-		    if (i.managerId) {
-			    employeeString += ` (Manager: ${i.managerId})`;
-		    }
-		    console.log(employeeString);
+async function viewEmployees() {
+	const res = await queryAsync('SELECT employee.firstName, employee.lastName, employee.managerId, role.title FROM employee INNER JOIN role ON employee.roleId = role.id');
+	
+	console.log(chalk.bold.bgCyan('\nEMPLOYEES:'));
+    for (let i of res) {
+	    let employeeString = `— ${i.firstName} ${i.lastName}, ${i.title}`;
+	    if (i.managerId) {
+		    employeeString += ` (Manager: ${i.managerId})`;
 	    }
-	    console.log(' ');
-	    start();
-	});
+	    console.log(employeeString);
+    }
+    console.log(' ');
+    start();
 };
 
-function addDepartment() {
-	inquirer.prompt({
+async function addDepartment() {
+	const answer = await inquirer.prompt({
 		name: 'departmentName',
 		type: 'input',
 		message: 'Department Name:'
-	}).then(answer => {
-		connection.query('INSERT INTO department SET ?', { name: answer.departmentName }, err => {
-			if (err) throw err;
-			console.log(chalk.green('\nSUCCESS:'), 'Department was added.\n');
-			start();
-		});
 	});
+	
+	await queryAsync('INSERT INTO department SET ?', { name: answer.departmentName });
+	console.log(chalk.green('\nSUCCESS:'), 'Department was added.\n');
+	start();
 };
 
-function addRole() {
-	connection.query('SELECT * FROM department', (err, res) => {	
-		if (err) throw err;
-		inquirer.prompt([
-			{
-				name: 'role',
-				type: 'input',
-				message: 'Role Name:'
-			},
-			{
-				name: 'salary',
-				type: 'input',
-				message: 'Salary:',
-				validate: value => {
-				  if (isNaN(value) === false) return true;
-				  return false;
-				}
-			},
-			{
-				name: 'department',
-				type: 'list',
-				message: 'Department:',
-				choices: () => {
-					const departments = [];
-					for (let i of res) {
-						departments.push(i.name);
-					}
-					return departments;
-				}
+async function addRole() {
+	const res = await queryAsync('SELECT * FROM department');	
+	const answer = await inquirer.prompt([
+		{
+			name: 'role',
+			type: 'input',
+			message: 'Role Name:'
+		},
+		{
+			name: 'salary',
+			type: 'input',
+			message: 'Salary:',
+			validate: value => {
+			  if (isNaN(value) === false) return true;
+			  return false;
 			}
-		]).then(answer => {
-        	let departmentId;
-			for (let i of res) {
-				if (i.name === answer.department) {
-					departmentId = i.id;
-          		}
-        	}        	
-        	connection.query('INSERT INTO role SET ?', { title: answer.role, salary: answer.salary, departmentId: departmentId }, err => {
-				if (err) throw err;
-				console.log(chalk.green('\nSUCCESS:'), 'Role was added.\n');
-				start();
-			});
-		});
-	});
-};
-
-function addEmployee() {
-	connection.query('SELECT * FROM role', (err, res) => {	
-		if (err) throw err;
-		inquirer.prompt([
-			{
-				name: 'firstName',
-				type: 'input',
-				message: 'First Name:'
-			},
-			{
-				name: 'lastName',
-				type: 'input',
-				message: 'Last Name:'
-			},	
-			{
-				name: 'role',
-				type: 'list',
-				message: 'Role:',
-				choices: () => {
-					const roles = [];
-					for (let i of res) {
-						roles.push(i.title);
-					}
-					return roles;
-				}
-			}
-			// Manager ID prompt goes here
-		]).then(answer => {
-        	let roleId;
-			for (let i of res) {
-				if (i.title === answer.role) {
-					roleId = i.id;
-          		}
-        	}   
-        	// Need to add Manager ID     	
-        	connection.query('INSERT INTO employee SET ?', { firstName: answer.firstName, lastName: answer.lastName, roleId: roleId }, err => {
-				if (err) throw err;
-				console.log(chalk.green('\nSUCCESS:'), 'Employee was added.\n');
-				start();
-			});
-		});
-	});
-};
-
-function deleteDepartment() {
-	connection.query('SELECT * FROM department', (err, res) => {
-		inquirer.prompt({
+		},
+		{
 			name: 'department',
 			type: 'list',
-			message: 'Department to Delete:',
+			message: 'Department:',
 			choices: () => {
 				const departments = [];
 				for (let i of res) {
@@ -242,67 +162,148 @@ function deleteDepartment() {
 				}
 				return departments;
 			}
-		}).then(answer => {
-			connection.query('DELETE FROM department WHERE ?', { name: answer.department }, err => {
-				if (err) throw err;
-				console.log(chalk.green('\nSUCCESS:'), 'Department was deleted.\n');
-				start();
-			});
-		});
-	});
+		}
+	]);
+
+	let departmentId;
+	for (let i of res) {
+		if (i.name === answer.department) {
+			departmentId = i.id;
+  		}
+	}  
+	      	
+	await queryAsync('INSERT INTO role SET ?', { title: answer.role, salary: answer.salary, departmentId: departmentId });
+	console.log(chalk.green('\nSUCCESS:'), 'Role was added.\n');
+	start();
 };
 
-function deleteRole() {
-	connection.query('SELECT * FROM role', (err, res) => {
-		inquirer.prompt({
+async function addEmployee() {
+	const resR = await queryAsync('SELECT * FROM role');
+	const answerR = await inquirer.prompt([
+		{
+			name: 'firstName',
+			type: 'input',
+			message: 'First Name:'
+		},
+		{
+			name: 'lastName',
+			type: 'input',
+			message: 'Last Name:'
+		},	
+		{
 			name: 'role',
 			type: 'list',
-			message: 'Role to Delete:',
+			message: 'Role:',
 			choices: () => {
 				const roles = [];
-				for (let i of res) {
+				for (let i of resR) {
 					roles.push(i.title);
 				}
 				return roles;
 			}
-		}).then(answer => {
-			connection.query('DELETE FROM role WHERE ?', { title: answer.role }, err => {
-				if (err) throw err;
-				console.log(chalk.green('\nSUCCESS:'), 'Role was deleted.\n');
-				start();
-			});
-		});
+		}
+	]);
+	
+	const resE = await queryAsync('SELECT * FROM employee');
+	const answerE = await inquirer.prompt({
+		name: 'employee',
+		type: 'list',
+		message: 'Manager:',
+		choices: () => {
+			const names = [];
+			for (let i of resE) {
+				names.push(`${i.firstName} ${i.lastName}`);
+			}
+			return names;
+		}
 	});
+	
+	let roleId;
+	for (let i of resR) {
+		if (i.title === answerR.role) {
+			roleId = i.id;
+  		}
+	}
+	
+	let managerId;
+	for (let i of resE) {
+		const fullName = `${i.firstName} ${i.lastName}`;
+		if (fullName === answerE.employee) {
+			managerId = i.id;
+		}
+	}
+	
+	await queryAsync('INSERT INTO employee SET ?', { firstName: answerR.firstName, lastName: answerR.lastName, roleId: roleId, managerId: managerId });
+	console.log(chalk.green('\nSUCCESS:'), 'Employee was added.\n');
+	start();
 };
 
-function deleteEmployee() {
-	connection.query('SELECT * FROM employee', (err, res) => {
-		inquirer.prompt({
-			name: 'employee',
-			type: 'list',
-			message: 'Employee to Delete:',
-			choices: () => {
-				const names = [];
-				for (let i of res) {
-					names.push(`${i.firstName} ${i.lastName}`);
-				}
-				return names;
-			}
-		}).then(answer => {		
-			let deleteId;	
+async function deleteDepartment() {
+	const res = await queryAsync('SELECT * FROM department');
+	const answer = await inquirer.prompt({
+		name: 'department',
+		type: 'list',
+		message: 'Department to Delete:',
+		choices: () => {
+			const departments = [];
 			for (let i of res) {
-				let deleteName = `${i.firstName} ${i.lastName}`;
-				if (deleteName === answer.employee) {
-					deleteId = i.id;
-				}
-			}	
-			connection.query('DELETE FROM employee WHERE ?', { id: deleteId }, err => {
-				if (err) throw err;
-				console.log(chalk.green('\nSUCCESS:'), 'Employee was deleted.\n');
-				start();
-			});
-		});
+				departments.push(i.name);
+			}
+			return departments;
+		}
 	});
+
+	await queryAsync('DELETE FROM department WHERE ?', { name: answer.department });
+	console.log(chalk.green('\nSUCCESS:'), 'Department was deleted.\n');
+	start();
+};
+
+async function deleteRole() {
+	const res = await queryAsync('SELECT * FROM role');
+	const answer = await inquirer.prompt({
+		name: 'role',
+		type: 'list',
+		message: 'Role to Delete:',
+		choices: () => {
+			const roles = [];
+			for (let i of res) {
+				roles.push(i.title);
+			}
+			return roles;
+		}
+	});
+		
+	await queryAsync('DELETE FROM role WHERE ?', { title: answer.role });
+	console.log(chalk.green('\nSUCCESS:'), 'Role was deleted.\n');
+	start();
+};
+
+async function deleteEmployee() {
+	const res = await queryAsync('SELECT * FROM employee');	
+	const answer = await inquirer.prompt({
+		name: 'employee',
+		type: 'list',
+		message: 'Employee to Delete:',
+		choices: () => {
+			const names = [];
+			for (let i of res) {
+				names.push(`${i.firstName} ${i.lastName}`);
+			}
+			return names;
+		}
+	});
+		
+	let deleteId;	
+	for (let i of res) {
+		let deleteName = `${i.firstName} ${i.lastName}`;
+		if (deleteName === answer.employee) {
+			deleteId = i.id;
+		}
+	}
+		
+	await queryAsync('DELETE FROM employee WHERE ?', { id: deleteId });
+	console.log(chalk.green('\nSUCCESS:'), 'Employee was deleted.\n');
+	start();
 };
 
 async function updateSalary() {
@@ -329,7 +330,8 @@ async function updateSalary() {
 			  return false;
 			}
 		}
-	]);			
+	]);		
+		
 	await queryAsync('UPDATE role SET salary = ? WHERE title = ?', [answer.salary, answer.title]);	
 	console.log(chalk.green('\nSUCCESS:'), 'Salary was updated.\n');
 	start();
@@ -366,15 +368,15 @@ async function updateRole() {
 	
 	const select = await queryAsync('SELECT employee.id, employee.firstName, employee.lastName, employee.roleId, role.title FROM employee INNER JOIN role ON employee.roleId = role.id');
 	
-	let employeeId;
-	let newRoleId;	
-	
+	let employeeId;	
 	for (let i of select) {
 		const fullName = `${i.firstName} ${i.lastName}`;
 		if (fullName === answerE.employee) {
 			employeeId = i.id;
 		}
 	}
+	
+	let newRoleId;
 	for (let i of resR) {
 		if (i.title === answerR.role) {
 			newRoleId = i.id;
