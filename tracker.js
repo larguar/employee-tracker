@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
+const util = require("util");
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -15,6 +16,8 @@ connection.connect(err => {
   console.log(' ');
   start();
 });
+
+const queryAsync = util.promisify(connection.query).bind(connection);
 
 function start() {
 	inquirer.prompt({
@@ -80,7 +83,7 @@ function start() {
 				break;
 		}
 	});
-}
+};
 
 function viewDepartments() {
 	connection.query('SELECT * FROM department', (err, res) => {
@@ -92,10 +95,10 @@ function viewDepartments() {
 	    console.log(' ');
 	    start();
 	});
-}
+};
 
 function viewRoles() {
-	connection.query('SELECT role.title, role.salary, department.name FROM role INNER JOIN department ON role.department_id = department.id', (err, res) => {
+	connection.query('SELECT role.title, role.salary, department.name FROM role INNER JOIN department ON role.departmentId = department.id', (err, res) => {
     	if (err) throw err;
     	console.log(chalk.bold.bgCyan('\nROLES:'));
 	    for (let i of res) {
@@ -104,23 +107,23 @@ function viewRoles() {
 	    console.log(' ');
 	    start();
 	});
-}
+};
 
 function viewEmployees() {
-	connection.query('SELECT employee.first_name, employee.last_name, employee.manager, role.title FROM employee INNER JOIN role ON employee.role_id = role.id', (err, res) => {
+	connection.query('SELECT employee.firstName, employee.lastName, employee.managerId, role.title FROM employee INNER JOIN role ON employee.roleId = role.id', (err, res) => {
     	if (err) throw err;
     	console.log(chalk.bold.bgCyan('\nEMPLOYEES:'));
 	    for (let i of res) {
-		    let employeeString = `— ${i.first_name} ${i.last_name}, ${i.title}`;
-		    if (i.manager) {
-			    employeeString += ` (Manager: ${i.manager})`;
+		    let employeeString = `— ${i.firstName} ${i.lastName}, ${i.title}`;
+		    if (i.managerId) {
+			    employeeString += ` (Manager: ${i.managerId})`;
 		    }
 		    console.log(employeeString);
 	    }
 	    console.log(' ');
 	    start();
 	});
-}
+};
 
 function addDepartment() {
 	inquirer.prompt({
@@ -173,7 +176,7 @@ function addRole() {
 					departmentId = i.id;
           		}
         	}        	
-        	connection.query('INSERT INTO role SET ?', { title: answer.role, salary: answer.salary, department_id: departmentId }, err => {
+        	connection.query('INSERT INTO role SET ?', { title: answer.role, salary: answer.salary, departmentId: departmentId }, err => {
 				if (err) throw err;
 				console.log(chalk.green('\nSUCCESS:'), 'Role was added.\n');
 				start();
@@ -217,7 +220,7 @@ function addEmployee() {
           		}
         	}   
         	// Need to add Manager ID     	
-        	connection.query('INSERT INTO employee SET ?', { first_name: answer.firstName, last_name: answer.lastName, role_id: roleId }, err => {
+        	connection.query('INSERT INTO employee SET ?', { firstName: answer.firstName, lastName: answer.lastName, roleId: roleId }, err => {
 				if (err) throw err;
 				console.log(chalk.green('\nSUCCESS:'), 'Employee was added.\n');
 				start();
@@ -281,14 +284,14 @@ function deleteEmployee() {
 			choices: () => {
 				const names = [];
 				for (let i of res) {
-					names.push(`${i.first_name} ${i.last_name}`);
+					names.push(`${i.firstName} ${i.lastName}`);
 				}
 				return names;
 			}
 		}).then(answer => {		
 			let deleteId;	
 			for (let i of res) {
-				let deleteName = `${i.first_name} ${i.last_name}`;
+				let deleteName = `${i.firstName} ${i.lastName}`;
 				if (deleteName === answer.employee) {
 					deleteId = i.id;
 				}
@@ -302,42 +305,85 @@ function deleteEmployee() {
 	});
 };
 
-function updateSalary() {
-	connection.query('SELECT * FROM role', (err, res) => {
-		inquirer.prompt([
-			{
-				name: 'title',
-				type: 'list',
-				message: 'Role:',
-				choices: () => {
-					const roles = [];
-					for (let i of res) {
-						roles.push(i.title);
-					}
-					return roles;
+async function updateSalary() {
+	const res = await queryAsync('SELECT * FROM role');	
+	const answer = await inquirer.prompt([
+		{
+			name: 'title',
+			type: 'list',
+			message: 'Role:',
+			choices: () => {
+				const roles = [];
+				for (let i of res) {
+					roles.push(i.title);
 				}
-			},
-			{
-				name: 'salary',
-				type: 'input',
-				message: 'New Salary:',
-				validate: value => {
-				  if (isNaN(value) === false) return true;
-				  return false;
-				}
+				return roles;
 			}
-		]).then(answer => {	
-			connection.query('UPDATE role SET salary = ? WHERE title = ?', [answer.salary, answer.title], err => {
-				if (err) throw err;
-				console.log(chalk.green('\nSUCCESS:'), 'Salary was updated.\n');
-				start();
-			});
-		});
-	});
+		},
+		{
+			name: 'salary',
+			type: 'input',
+			message: 'New Salary:',
+			validate: value => {
+			  if (isNaN(value) === false) return true;
+			  return false;
+			}
+		}
+	]);			
+	await queryAsync('UPDATE role SET salary = ? WHERE title = ?', [answer.salary, answer.title]);	
+	console.log(chalk.green('\nSUCCESS:'), 'Salary was updated.\n');
+	start();
 };
 
-function updateRole() {
-	console.log(`updateRole()`);
+async function updateRole() {
+	const resE = await queryAsync('SELECT * FROM employee');	
+	const answerE = await inquirer.prompt({
+		name: 'employee',
+		type: 'list',
+		message: 'Employee to Update:',
+		choices: () => {
+			const names = [];
+			for (let i of resE) {
+				names.push(`${i.firstName} ${i.lastName}`);
+			}
+			return names;
+		}
+	});
+
+	const resR = await queryAsync('SELECT * FROM role');	
+	const answerR = await inquirer.prompt({
+		name: 'role',
+		type: 'list',
+		message: 'New Role:',
+		choices: () => {
+			const roles = [];
+			for (let i of resR) {
+				roles.push(i.title);
+			}
+			return roles;
+		}
+	});
+	
+	const select = await queryAsync('SELECT employee.id, employee.firstName, employee.lastName, employee.roleId, role.title FROM employee INNER JOIN role ON employee.roleId = role.id');
+	
+	let employeeId;
+	let newRoleId;	
+	
+	for (let i of select) {
+		const fullName = `${i.firstName} ${i.lastName}`;
+		if (fullName === answerE.employee) {
+			employeeId = i.id;
+		}
+	}
+	for (let i of resR) {
+		if (i.title === answerR.role) {
+			newRoleId = i.id;
+		}
+	}
+
+	await queryAsync('UPDATE employee SET roleId = ? WHERE id = ?', [newRoleId, employeeId]);
+	
+	console.log(chalk.green('\nSUCCESS:'), 'Salary was updated.\n');
 	start();
 };
 
