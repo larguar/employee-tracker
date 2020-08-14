@@ -107,18 +107,19 @@ async function viewRoles() {
     start();
 };
 
-async function viewEmployees() {
-	const res = await queryAsync('SELECT employee.firstName, employee.lastName, employee.managerId, role.title FROM employee INNER JOIN role ON employee.roleId = role.id');
+async function viewEmployees() {	
+	const res = await queryAsync('SELECT e.firstName, e.lastName, CONCAT(m.firstName, " ", m.lastName) AS managerName, role.title FROM employee e LEFT JOIN employee m ON m.id = e.managerId INNER JOIN role ON e.roleId = role.id');
 	
 	console.log(chalk.bold.bgCyan('\nEMPLOYEES:'));
-    for (let i of res) {
+    for (let i of res) {    
 	    let employeeString = `— ${i.firstName} ${i.lastName}, ${i.title}`;
-	    if (i.managerId) {
-		    employeeString += ` (Manager: ${i.managerId})`;
+	    if (i.managerName) {
+		    employeeString += ` (Manager: ${i.managerName})`;
 	    }
 	    console.log(employeeString);
     }
     console.log(' ');
+
     start();
 };
 
@@ -210,7 +211,7 @@ async function addEmployee() {
 		type: 'list',
 		message: 'Manager:',
 		choices: () => {
-			const names = [];
+			const names = ['None'];
 			for (let i of resE) {
 				names.push(`${i.firstName} ${i.lastName}`);
 			}
@@ -233,7 +234,7 @@ async function addEmployee() {
 		}
 	}
 	
-	await queryAsync('INSERT INTO employee SET ?', { firstName: answerR.firstName, lastName: answerR.lastName, roleId: roleId, managerId: managerId });
+	await queryAsync('INSERT INTO employee SET ?', { firstName: answerR.firstName, lastName: answerR.lastName, roleId: roleId, managerId: managerId});
 	console.log(chalk.green('\nSUCCESS:'), 'Employee was added.\n');
 	start();
 };
