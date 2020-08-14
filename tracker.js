@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
+const consoleTable = require('console.table');
 const util = require("util");
 
 const connection = mysql.createConnection({
@@ -87,39 +88,34 @@ function start() {
 
 async function viewDepartments() {
 	const res = await queryAsync('SELECT * FROM department');
-
-	console.log(chalk.bold.bgCyan('\nDEPARTMENTS:'));
+	const allDepartments = [];
+	console.log(' ');
     for (let i of res) {
-	    console.log(`— ${i.name}`);
+	    allDepartments.push({ ID: i.id, NAME: i.name });
     }
-    console.log(' ');
+    console.table(allDepartments);
     start();
 };
 
 async function viewRoles() {
-	const res = await queryAsync('SELECT role.title, role.salary, department.name FROM role INNER JOIN department ON role.departmentId = department.id');
-
-    console.log(chalk.bold.bgCyan('\nROLES:'));
-    for (let i of res) {
-	    console.log(`— ${i.title}, $${i.salary}/year (${i.name})`);
-    }
+	const res = await queryAsync('SELECT role.id, role.title, role.salary, department.name FROM role INNER JOIN department ON role.departmentId = department.id');
+	const allRoles = [];
     console.log(' ');
+    for (let i of res) {
+	    allRoles.push({ ID: i.id, TITLE: i.title, SALARY: i.salary, DEPARTMENT: i.name });
+    }
+    console.table(allRoles);
     start();
 };
 
 async function viewEmployees() {	
-	const res = await queryAsync('SELECT e.firstName, e.lastName, CONCAT(m.firstName, " ", m.lastName) AS managerName, role.title FROM employee e LEFT JOIN employee m ON m.id = e.managerId INNER JOIN role ON e.roleId = role.id');
-	
-	console.log(chalk.bold.bgCyan('\nEMPLOYEES:'));
-    for (let i of res) {    
-	    let employeeString = `— ${i.firstName} ${i.lastName}, ${i.title}`;
-	    if (i.managerName) {
-		    employeeString += ` (Manager: ${i.managerName})`;
-	    }
-	    console.log(employeeString);
+	const res = await queryAsync('SELECT e.id, CONCAT(e.firstName, " ", e.lastName) AS employeeName, role.title, role.salary, CONCAT(m.firstName, " ", m.lastName) AS managerName FROM employee e LEFT JOIN employee m ON m.id = e.managerId INNER JOIN role ON e.roleId = role.id');
+	const allEmployees = [];
+	console.log(' ');
+    for (let i of res) {   
+	    allEmployees.push({ ID: i.id, NAME: i.employeeName, ROLE: i.title, SALARY: i.salary, MANAGER: i.managerName });
     }
-    console.log(' ');
-
+	console.table(allEmployees);
     start();
 };
 
