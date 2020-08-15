@@ -4,6 +4,7 @@ const chalk = require('chalk');
 const consoleTable = require('console.table');
 const util = require("util");
 
+// boilerplate code
 const connection = mysql.createConnection({
   host: 'localhost',
   port: 3306,
@@ -18,10 +19,12 @@ connection.connect(err => {
   start();
 });
 
+// promisifys the connection query and allows for async/await to be used throughout
 const queryAsync = util.promisify(connection.query).bind(connection);
 
-function start() {
-	inquirer.prompt({
+// prompts the user a list of choices and switches through the functions based on their answers
+async function start() {
+	const answer = await inquirer.prompt({
 		name: 'selectOption',
 		type: 'list',
 		message: 'What would you like to do?',
@@ -40,52 +43,52 @@ function start() {
 			'Update An Employee\'s Manager',
 			'Exit'
 		]
-	}).then(answer => {
-		switch (answer.selectOption) {
-			case 'View All Departments':
-				viewDepartments();
-				break;
-			case 'View All Roles':
-				viewRoles();
-				break;
-			case 'View All Employees':
-				viewEmployees();
-				break;
-			case 'Add A Department':
-				addDepartment();
-				break;
-			case 'Add A Role':
-				addRole();
-				break;
-			case 'Add An Employee':
-				addEmployee();
-				break;
-			case 'Delete A Department':
-				deleteDepartment();
-				break;
-			case 'Delete A Role':
-				deleteRole();
-				break;
-			case 'Delete An Employee':
-				deleteEmployee();
-				break;
-			case 'Update A Role\'s Salary':
-				updateSalary();
-				break;
-			case 'Update An Employee\'s Role':
-				updateRole();
-				break;
-			case 'Update An Employee\'s Manager':
-				updateManager();
-				break;
-			case 'Exit':
-				console.log(' ');
-				connection.end();
-				break;
-		}
 	});
+	switch (answer.selectOption) {
+		case 'View All Departments':
+			viewDepartments();
+			break;
+		case 'View All Roles':
+			viewRoles();
+			break;
+		case 'View All Employees':
+			viewEmployees();
+			break;
+		case 'Add A Department':
+			addDepartment();
+			break;
+		case 'Add A Role':
+			addRole();
+			break;
+		case 'Add An Employee':
+			addEmployee();
+			break;
+		case 'Delete A Department':
+			deleteDepartment();
+			break;
+		case 'Delete A Role':
+			deleteRole();
+			break;
+		case 'Delete An Employee':
+			deleteEmployee();
+			break;
+		case 'Update A Role\'s Salary':
+			updateSalary();
+			break;
+		case 'Update An Employee\'s Role':
+			updateRole();
+			break;
+		case 'Update An Employee\'s Manager':
+			updateManager();
+			break;
+		case 'Exit':
+			console.log(' ');
+			connection.end();
+			break;
+	}
 };
 
+// console.table everything in the department table
 async function viewDepartments() {
 	const res = await queryAsync('SELECT * FROM department');
 	const allDepartments = [];
@@ -97,6 +100,7 @@ async function viewDepartments() {
     start();
 };
 
+// console.table everything in the role table
 async function viewRoles() {
 	const res = await queryAsync('SELECT role.id, role.title, role.salary, department.name FROM role INNER JOIN department ON role.departmentId = department.id');
 	const allRoles = [];
@@ -108,6 +112,7 @@ async function viewRoles() {
     start();
 };
 
+// console.table everything in the employee table
 async function viewEmployees() {	
 	const res = await queryAsync('SELECT e.id, CONCAT(e.firstName, " ", e.lastName) AS employeeName, role.title, role.salary, CONCAT(m.firstName, " ", m.lastName) AS managerName FROM employee e LEFT JOIN employee m ON m.id = e.managerId INNER JOIN role ON e.roleId = role.id');
 	const allEmployees = [];
@@ -119,6 +124,7 @@ async function viewEmployees() {
     start();
 };
 
+// add the department in the department table
 async function addDepartment() {
 	const answer = await inquirer.prompt({
 		name: 'departmentName',
@@ -130,6 +136,7 @@ async function addDepartment() {
 	viewDepartments();
 };
 
+// add the role in the role table
 async function addRole() {
 	const res = await queryAsync('SELECT * FROM department');	
 	const answer = await inquirer.prompt([
@@ -171,6 +178,7 @@ async function addRole() {
 	viewRoles();
 };
 
+// add the employee in the employee table
 async function addEmployee() {
 	const resR = await queryAsync('SELECT * FROM role');
 	const answerR = await inquirer.prompt([
@@ -197,7 +205,7 @@ async function addEmployee() {
 			}
 		}
 	]);	
-	const resE = await queryAsync('SELECT * FROM employee');
+	const resE = await queryAsync('SELECT employee.id, CONCAT(employee.firstName, " ", employee.lastName) AS employeeName, employee.roleId, employee.managerId FROM employee');
 	const answerE = await inquirer.prompt({
 		name: 'employee',
 		type: 'list',
@@ -205,7 +213,7 @@ async function addEmployee() {
 		choices: () => {
 			const names = ['None'];
 			for (let i of resE) {
-				names.push(`${i.firstName} ${i.lastName}`);
+				names.push(i.employeeName);
 			}
 			return names;
 		}
@@ -218,8 +226,7 @@ async function addEmployee() {
 	}	
 	let managerId;
 	for (let i of resE) {
-		const fullName = `${i.firstName} ${i.lastName}`;
-		if (fullName === answerE.employee) {
+		if (i.employeeName === answerE.employee) {
 			managerId = i.id;
 		}
 	}	
@@ -228,6 +235,7 @@ async function addEmployee() {
 	viewEmployees();
 };
 
+// delete the department in the department table
 async function deleteDepartment() {
 	const res = await queryAsync('SELECT * FROM department');
 	const answer = await inquirer.prompt({
@@ -247,6 +255,7 @@ async function deleteDepartment() {
 	viewDepartments();
 };
 
+// delete the role in the role table
 async function deleteRole() {
 	const res = await queryAsync('SELECT * FROM role');
 	const answer = await inquirer.prompt({
@@ -266,8 +275,9 @@ async function deleteRole() {
 	viewRoles();
 };
 
+// delete the employee in the employee table
 async function deleteEmployee() {
-	const res = await queryAsync('SELECT * FROM employee');	
+	const res = await queryAsync('SELECT employee.id, CONCAT(employee.firstName, " ", employee.lastName) AS employeeName, employee.roleId, employee.managerId FROM employee');	
 	const answer = await inquirer.prompt({
 		name: 'employee',
 		type: 'list',
@@ -275,15 +285,14 @@ async function deleteEmployee() {
 		choices: () => {
 			const names = [];
 			for (let i of res) {
-				names.push(`${i.firstName} ${i.lastName}`);
+				names.push(i.employeeName);
 			}
 			return names;
 		}
 	});		
 	let deleteId;	
 	for (let i of res) {
-		const deleteName = `${i.firstName} ${i.lastName}`;
-		if (deleteName === answer.employee) {
+		if (i.employeeName === answer.employee) {
 			deleteId = i.id;
 		}
 	}		
@@ -292,6 +301,7 @@ async function deleteEmployee() {
 	viewEmployees();
 };
 
+// update the salary in the role table
 async function updateSalary() {
 	const res = await queryAsync('SELECT * FROM role');	
 	const answer = await inquirer.prompt([
@@ -322,8 +332,9 @@ async function updateSalary() {
 	viewRoles();
 };
 
+// update the role id in the employee table
 async function updateRole() {
-	const resE = await queryAsync('SELECT * FROM employee');	
+	const resE = await queryAsync('SELECT employee.id, CONCAT(employee.firstName, " ", employee.lastName) AS employeeName, employee.roleId, employee.managerId FROM employee');	
 	const answerE = await inquirer.prompt({
 		name: 'employee',
 		type: 'list',
@@ -331,7 +342,7 @@ async function updateRole() {
 		choices: () => {
 			const names = [];
 			for (let i of resE) {
-				names.push(`${i.firstName} ${i.lastName}`);
+				names.push(i.employeeName);
 			}
 			return names;
 		}
@@ -352,8 +363,7 @@ async function updateRole() {
 	const select = await queryAsync('SELECT employee.id, employee.firstName, employee.lastName, employee.roleId, role.title FROM employee INNER JOIN role ON employee.roleId = role.id');	
 	let employeeId;	
 	for (let i of select) {
-		const fullName = `${i.firstName} ${i.lastName}`;
-		if (fullName === answerE.employee) {
+		if (i.employeeName === answerE.employee) {
 			employeeId = i.id;
 		}
 	}	
@@ -368,6 +378,7 @@ async function updateRole() {
 	viewEmployees();
 };
 
+// update the manager id in the employee table
 async function updateManager() {
 	const res = await queryAsync('SELECT e.id, CONCAT(e.firstName, " ", e.lastName) AS employeeName, e.managerId, CONCAT(m.firstName, " ", m.lastName) AS managerName FROM employee e LEFT JOIN employee m ON m.id = e.managerId');	
 	const answer = await inquirer.prompt([
