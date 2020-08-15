@@ -1,5 +1,5 @@
 # Employee Tracker
-A command-line application for managing a company's departments, roles, and employees using node, inquirer, and MySQL. From viewing your company’s departments and roles, to updating an employee’s manager or salary, to deleting an employee, role, or an entire department, you can use this simple application to make your changes in one place.
+A command-line application for managing a company's departments, roles, and employees using node, inquirer, and MySQL. From viewing your company’s departments and roles to updating an employee’s manager or salary, you can use this simple application to make your changes in one place.
 
 ![JavaScript Badge](https://img.shields.io/badge/-JavaScript-539436) ![Node.JS Badge](https://img.shields.io/badge/-Node.JS-CF1848) ![MySQL Badge](https://img.shields.io/badge/-MySQL-61489C)  
 
