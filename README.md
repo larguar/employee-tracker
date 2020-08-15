@@ -3,7 +3,7 @@ A simple command-line application for managing a company's employees using node,
 
 ![JavaScript Badge](https://img.shields.io/badge/-JavaScript-539436) ![Node.JS Badge](https://img.shields.io/badge/-Node.JS-CF1848) ![MySQL Badge](https://img.shields.io/badge/-MySQL-61489C)  
 
-![Application Screenshot](sdvfadfv)
+![Application Screenshot](img/usage.gif)
 
 
 ## User Story
