@@ -24,8 +24,8 @@ sdfv
 * [Install](#installation)
 * [Usage](#usage) 
 * [Walkthrough](#walkthrough)   
-* [Questions](#questions) 
 * [Credits](#credits)
+* [Questions](#questions) 
 * [Donate](#donate)
 * [License](#license) 
 
@@ -46,10 +46,14 @@ const connection = mysql.createConnection({
   database: 'employeeDB'
 });
 ```
+* Run the `schema.sql` file through MySQL or your command line to create your database and tables:
+```
+mysql -u root -p < schema.sql
+```
 
 
 ## Usage 
-* Start the application by typing `npm tracker` in your command line:
+* Start the application by typing `node tracker` in your command line:
 
 ![Application Screenshot](img/start.gif) 
 
