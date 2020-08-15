@@ -1,3 +1,5 @@
+USE employeeDB;
+
 INSERT INTO department (name)
 VALUES ('Design'), ('Marketing');
 
