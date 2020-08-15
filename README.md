@@ -47,7 +47,7 @@ const connection = mysql.createConnection({
 ```
 * Run the `schema.sql` file through MySQL or your command line to create your database and tables:
 ```
-mysql -u root -p < schema.sql
+mysql -u root -p < db/schema.sql
 ```
 
 
