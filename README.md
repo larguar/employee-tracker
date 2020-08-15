@@ -51,15 +51,15 @@ const connection = mysql.createConnection({
 ## Usage 
 * Start the application by typing `npm tracker` in your command line:
 
-![Application Screenshot](sdfvsdfv) 
+![Application Screenshot](img/start.gif) 
 
 * Select a choice when prompted and continue to make changes for as long as you'd like:
 
-![Application Screenshot](sdfvsdfv) 
+![Application Screenshot](img/usage.gif) 
 
-* When you're done, you can select `Exit` at the end of the main menu choices or `^C` at any time:
+* When you're done, you can select `Exit` at the end of the main menu choices or `^c` at any time:
 
-![Application Screenshot](sdfvsdfv) 
+![Application Screenshot](img/exit.gif) 
 
 
 ## Walkthrough
