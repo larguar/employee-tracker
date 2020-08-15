@@ -1,1 +1,82 @@
-# employee-tracker
+# Employee Tracker
+A simple command-line application for managing a company's employees using node, inquirer, and MySQL.
+
+![JavaScript Badge](https://img.shields.io/badge/-JavaScript-539436) ![Node.JS Badge](https://img.shields.io/badge/-Node.JS-CF1848) ![MySQL Badge](https://img.shields.io/badge/-MySQL-61489C)  
+
+![Application Screenshot](sdvfadfv)
+
+
+## User Story
+```
+As a business owner
+I want to be able to view and manage the departments, roles, and employees in my company
+So that I can organize and plan my business
+```
+
+
+## Functionality
+```
+sdfv
+```
+
+
+## Table of Contents 
+* [Install](#installation)
+* [Usage](#usage) 
+* [Walkthrough](#walkthrough)   
+* [Questions](#questions) 
+* [Credits](#credits)
+* [Donate](#donate)
+* [License](#license) 
+
+
+## Installation
+* Download the sdvfsdfv
+* Create (or update) a `.gitignore` file and add `node_modules/` and `.DS_Store/` to it:
+```
+node_modules/
+.DS_Store/
+```
+* Install the sdfvsdfv package through a command line npm install:
+```
+npm install sdfvsdfv
+```
+
+
+## Usage 
+* Start the application by typing `npm tracker` in your command line:
+
+![Application Screenshot](sdfvsdfv) 
+
+* Select a choice when prompted and continue to make changes for as long as you'd like:
+
+![Application Screenshot](sdfvsdfv) 
+
+* When you're done, you can select `Exit` at the end of the main menu choices or `^C` at any time:
+
+![Application Screenshot](sdfvsdfv) 
+
+
+## Walkthrough
+[![Walkthrough Video Screenshot](sdfvsdfv)](sdfvsdfv)   
+
+
+## Credits
+This CLI App wouldn't run without [Inquirer](https://www.npmjs.com/package/inquirer) or [MySQL](https://www.npmjs.com/package/mysql). [Chalk](https://www.npmjs.com/package/chalk) and [console.table](https://www.npmjs.com/package/console.table) helped make the content more readable in the console. 
+
+
+## Questions
+If you have any questions, feel free to find me at:
+* Email: laurensiminski@gmail.com
+* Website: https://siminski.co
+* Github: [@siminski](https://github.com/siminski)
+
+
+## Donate
+Appreciate this code? Say thanks with a coffee:
+
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W21YVJJ)
+
+
+## License
+Copyright (c) 2020 Lauren Siminski.
