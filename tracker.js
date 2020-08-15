@@ -124,11 +124,10 @@ async function addDepartment() {
 		name: 'departmentName',
 		type: 'input',
 		message: 'Department Name:'
-	});
-	
+	});	
 	await queryAsync('INSERT INTO department SET ?', { name: answer.departmentName });
-	console.log(chalk.green('\nSUCCESS:'), 'Department was added.\n');
-	start();
+	console.log(chalk.bold.bgCyan('\nSUCCESS:'), 'Department was added.');
+	viewDepartments();
 };
 
 async function addRole() {
@@ -161,17 +160,15 @@ async function addRole() {
 			}
 		}
 	]);
-
 	let departmentId;
 	for (let i of res) {
 		if (i.name === answer.department) {
 			departmentId = i.id;
   		}
-	}  
-	      	
+	}  	      	
 	await queryAsync('INSERT INTO role SET ?', { title: answer.role, salary: answer.salary, departmentId: departmentId });
-	console.log(chalk.green('\nSUCCESS:'), 'Role was added.\n');
-	start();
+	console.log(chalk.bold.bgCyan('\nSUCCESS:'), 'Role was added.');
+	viewRoles();
 };
 
 async function addEmployee() {
@@ -199,8 +196,7 @@ async function addEmployee() {
 				return roles;
 			}
 		}
-	]);
-	
+	]);	
 	const resE = await queryAsync('SELECT * FROM employee');
 	const answerE = await inquirer.prompt({
 		name: 'employee',
@@ -213,26 +209,23 @@ async function addEmployee() {
 			}
 			return names;
 		}
-	});
-	
+	});	
 	let roleId;
 	for (let i of resR) {
 		if (i.title === answerR.role) {
 			roleId = i.id;
   		}
-	}
-	
+	}	
 	let managerId;
 	for (let i of resE) {
 		const fullName = `${i.firstName} ${i.lastName}`;
 		if (fullName === answerE.employee) {
 			managerId = i.id;
 		}
-	}
-	
+	}	
 	await queryAsync('INSERT INTO employee SET ?', { firstName: answerR.firstName, lastName: answerR.lastName, roleId: roleId, managerId: managerId});
-	console.log(chalk.green('\nSUCCESS:'), 'Employee was added.\n');
-	start();
+	console.log(chalk.bold.bgCyan('\nSUCCESS:'), 'Employee was added.');
+	viewEmployees();
 };
 
 async function deleteDepartment() {
@@ -249,10 +242,9 @@ async function deleteDepartment() {
 			return departments;
 		}
 	});
-
 	await queryAsync('DELETE FROM department WHERE ?', { name: answer.department });
-	console.log(chalk.green('\nSUCCESS:'), 'Department was deleted.\n');
-	start();
+	console.log(chalk.bold.bgCyan('\nSUCCESS:'), 'Department was deleted.');
+	viewDepartments();
 };
 
 async function deleteRole() {
@@ -268,11 +260,10 @@ async function deleteRole() {
 			}
 			return roles;
 		}
-	});
-		
+	});		
 	await queryAsync('DELETE FROM role WHERE ?', { title: answer.role });
-	console.log(chalk.green('\nSUCCESS:'), 'Role was deleted.\n');
-	start();
+	console.log(chalk.bold.bgCyan('\nSUCCESS:'), 'Role was deleted.');
+	viewRoles();
 };
 
 async function deleteEmployee() {
@@ -288,19 +279,17 @@ async function deleteEmployee() {
 			}
 			return names;
 		}
-	});
-		
+	});		
 	let deleteId;	
 	for (let i of res) {
-		let deleteName = `${i.firstName} ${i.lastName}`;
+		const deleteName = `${i.firstName} ${i.lastName}`;
 		if (deleteName === answer.employee) {
 			deleteId = i.id;
 		}
-	}
-		
+	}		
 	await queryAsync('DELETE FROM employee WHERE ?', { id: deleteId });
-	console.log(chalk.green('\nSUCCESS:'), 'Employee was deleted.\n');
-	start();
+	console.log(chalk.bold.bgCyan('\nSUCCESS:'), 'Employee was deleted.');
+	viewEmployees();
 };
 
 async function updateSalary() {
@@ -327,11 +316,10 @@ async function updateSalary() {
 			  return false;
 			}
 		}
-	]);		
-		
+	]);				
 	await queryAsync('UPDATE role SET salary = ? WHERE title = ?', [answer.salary, answer.title]);	
-	console.log(chalk.green('\nSUCCESS:'), 'Salary was updated.\n');
-	start();
+	console.log(chalk.bold.bgCyan('\nSUCCESS:'), 'Salary was updated.');
+	viewRoles();
 };
 
 async function updateRole() {
@@ -348,7 +336,6 @@ async function updateRole() {
 			return names;
 		}
 	});
-
 	const resR = await queryAsync('SELECT * FROM role');	
 	const answerR = await inquirer.prompt({
 		name: 'role',
@@ -361,28 +348,24 @@ async function updateRole() {
 			}
 			return roles;
 		}
-	});
-	
-	const select = await queryAsync('SELECT employee.id, employee.firstName, employee.lastName, employee.roleId, role.title FROM employee INNER JOIN role ON employee.roleId = role.id');
-	
+	});	
+	const select = await queryAsync('SELECT employee.id, employee.firstName, employee.lastName, employee.roleId, role.title FROM employee INNER JOIN role ON employee.roleId = role.id');	
 	let employeeId;	
 	for (let i of select) {
 		const fullName = `${i.firstName} ${i.lastName}`;
 		if (fullName === answerE.employee) {
 			employeeId = i.id;
 		}
-	}
-	
+	}	
 	let newRoleId;
 	for (let i of resR) {
 		if (i.title === answerR.role) {
 			newRoleId = i.id;
 		}
 	}
-
 	await queryAsync('UPDATE employee SET roleId = ? WHERE id = ?', [newRoleId, employeeId]);	
-	console.log(chalk.green('\nSUCCESS:'), 'Salary was updated.\n');
-	start();
+	console.log(chalk.bold.bgCyan('\nSUCCESS:'), 'Role was updated.');
+	viewEmployees();
 };
 
 async function updateManager() {
@@ -412,8 +395,7 @@ async function updateManager() {
 				return names;
 			}
 		}
-	]);
-	
+	]);	
 	let employeeId;
 	let newManagerId;
 	for (let i of res) {
@@ -423,9 +405,8 @@ async function updateManager() {
 		if (i.employeeName === answer.manager) {
 			newManagerId = i.id;
 		}
-	}
-	
+	}	
 	await queryAsync('UPDATE employee SET managerId = ? WHERE id = ?', [newManagerId, employeeId]);	
-	console.log(chalk.green('\nSUCCESS:'), 'Manager was updated.\n');
-	start();
+	console.log(chalk.bold.bgCyan('\nSUCCESS:'), 'Manager was updated.');
+	viewEmployees();
 };
