@@ -62,7 +62,7 @@ const connection = mysql.createConnection({
   database: 'employeeDB'
 });
 ```
-* Run the `schema.sql` file through MySQL or your command line to create your database and tables:
+* Run the `db/schema.sql` file through MySQL or your command line to create your database and tables:
 ```
 source ~/.bashrc
 mysql -u root -p < db/schema.sql
