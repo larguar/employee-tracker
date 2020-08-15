@@ -31,15 +31,20 @@ sdfv
 
 
 ## Installation
-* Download the sdvfsdfv
-* Create (or update) a `.gitignore` file and add `node_modules/` and `.DS_Store/` to it:
+* Download this repository or fork and clone it to your local device.
+* Run an `npm install` to install all of the dependencies:
 ```
-node_modules/
-.DS_Store/
+npm install
 ```
-* Install the sdfvsdfv package through a command line npm install:
+* Update the `tracker.js` file with your `localhost` connection password on line 12:
 ```
-npm install sdfvsdfv
+const connection = mysql.createConnection({
+  host: 'localhost',
+  port: 3306,
+  user: 'root',
+  password: 'p@ssw0rd',
+  database: 'employeeDB'
+});
 ```
 
 
@@ -58,11 +63,11 @@ npm install sdfvsdfv
 
 
 ## Walkthrough
-[![Walkthrough Video Screenshot](sdfvsdfv)](sdfvsdfv)   
+[![Walkthrough Video Screenshot](img/video.png)](https://youtu.be/ksIIrCnMJVY)   
 
 
 ## Credits
-This CLI App wouldn't run without [Inquirer](https://www.npmjs.com/package/inquirer) or [MySQL](https://www.npmjs.com/package/mysql). [Chalk](https://www.npmjs.com/package/chalk) and [console.table](https://www.npmjs.com/package/console.table) helped make the content more readable in the console. 
+This CLI App wouldn't run without [Inquirer](https://www.npmjs.com/package/inquirer) or [MySQL](https://www.npmjs.com/package/mysql). [Chalk](https://www.npmjs.com/package/chalk) and [console.table](https://www.npmjs.com/package/console.table) also helped make the content more readable in the console. 
 
 
 ## Questions
