@@ -22,8 +22,7 @@ sdfv
 
 ## Table of Contents 
 * [Install](#installation)
-* [Usage](#usage) 
-* [Walkthrough](#walkthrough)   
+* [Usage](#usage)  
 * [Credits](#credits)
 * [Questions](#questions) 
 * [Donate](#donate)
@@ -64,10 +63,6 @@ mysql -u root -p < schema.sql
 * When you're done, you can select `Exit` at the end of the main menu choices or `^c` at any time:
 
 ![Application Screenshot](img/exit.gif) 
-
-
-## Walkthrough
-[![Walkthrough Video Screenshot](img/video.png)](https://youtu.be/ksIIrCnMJVY)   
 
 
 ## Credits
