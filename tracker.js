@@ -360,7 +360,7 @@ async function updateRole() {
 			return roles;
 		}
 	});	
-	const select = await queryAsync('SELECT employee.id, employee.firstName, employee.lastName, employee.roleId, role.title FROM employee INNER JOIN role ON employee.roleId = role.id');	
+	const select = await queryAsync('SELECT employee.id, CONCAT(employee.firstName, " ", employee.lastName) AS employeeName, employee.roleId, role.title FROM employee INNER JOIN role ON employee.roleId = role.id');	
 	let employeeId;	
 	for (let i of select) {
 		if (i.employeeName === answerE.employee) {
