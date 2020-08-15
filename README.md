@@ -1,5 +1,5 @@
 # Employee Tracker
-A simple command-line application for managing a company's employees using node, inquirer, and MySQL.
+A command-line application for managing a company's departments, roles, and employees using node, inquirer, and MySQL. From viewing your company’s departments and roles, to updating an employee’s manager or salary, to deleting an employee, role, or an entire department, you can use this simple application to make your changes in one place.
 
 ![JavaScript Badge](https://img.shields.io/badge/-JavaScript-539436) ![Node.JS Badge](https://img.shields.io/badge/-Node.JS-CF1848) ![MySQL Badge](https://img.shields.io/badge/-MySQL-61489C)  
 
@@ -16,7 +16,24 @@ So that I can organize and plan my business
 
 ## Functionality
 ```
-sdfv
+WHEN I run the application
+THEN I am prompted with a list of options
+WHEN I select ‘View All Departments’/‘View All Roles’/‘View All Employees’
+THEN I can view a table with all of the current data in the department/role/employee database table
+WHEN I select ‘Add A Department’/‘Add A Role’/‘Add An Employee’
+THEN I am prompted for the data needed to add a new department/role/employee
+THEN based on my input, a new department/role/employee is added to the appropriate database table
+WHEN I select ‘Delete A Department’/‘Delete A Role’/‘Delete An Employee’
+THEN I am prompted with a list of all current departments/roles/employees
+THEN based on my input, a department/role/employee is deleted from the database
+WHEN I select ‘Update A Role's Salary’
+THEN I am prompted for the role to update and the new salary
+THEN based on my input, the role is updated
+WHEN I select ‘Update An Employee's Role’/‘Update An Employee's Manager’
+THEN I am prompted for the employee to update and the new role/manager
+THEN based on my input, the employee is updated
+WHEN I select ‘Exit’
+THEN the application stops running
 ```
 
 
